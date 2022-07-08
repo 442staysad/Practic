@@ -7,7 +7,11 @@ namespace Onion.Infrastructure.Data
 {
     public class ApplicationDbContext:DbContext
     {
-        DbSet<SystemRole> SystemRoles { get; set; }
+        public DbSet<SystemRole> SystemRoles { get; set; }
+
+        public DbSet<Employee> Employees { get; set; }
+
+        public DbSet<Department> Departments { get; set; } 
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
                 : base(options)

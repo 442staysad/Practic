@@ -7,9 +7,10 @@ using Microsoft.EntityFrameworkCore;
 using Onion.Infrastructure.Data;
 using Onion.Core.Interfaces;
 using Onion.Infrastructure.Repository;
-//using Onion.Core.Services;
-using System;
+using Onion.Core.Entities;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Onion.Core.Services;
 
 namespace Onion.Web
 {
@@ -31,8 +32,8 @@ namespace Onion.Web
             // check path!!
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
                             options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login"));
-
-            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddScoped(typeof(IRepository<>),typeof(Repository<>));
+            services.AddScoped<IEmployee, EmployeeService>();
             services.AddControllersWithViews();
         }
 
@@ -51,6 +52,7 @@ namespace Onion.Web
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

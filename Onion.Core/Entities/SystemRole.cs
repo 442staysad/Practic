@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Onion.Core.Entities
 {
-    public class SystemRole:BaseEntity
+    public class SystemRole : BaseEntity
     {
         public string RoleName { get; set; }
     }
