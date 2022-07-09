@@ -4,42 +4,28 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 
 namespace Onion.Core.Services
 {
     public class EmployeeService : IEmployee
     {
-        IRepository<Employee> userRepository;
+        private readonly IRepository<Employee> userRepository;
 
         public EmployeeService(IRepository<Employee> userRepository)
         {
             this.userRepository = userRepository;
         }
 
-        public int CurrentUserId(string login)
+        public async Task<int> CurrentUserId(string login)
         {
-            var currentUser = userRepository.Find(x => x.WorkEmailAddress == login);
-            if (currentUser != null)
-            {
-                return currentUser.Id;
-            }
-            else
-            {
-                return 1;
-            }
+            var currentUser = await userRepository.FindAsync(x => x.WorkEmailAddress == login);
+            return await Task.Run(()=> currentUser == null ? 1 : currentUser.Id);
         }
 
-        public bool IsAuthenticatedLogin(string login, string password)
+        public async Task<bool> IsAuthenticatedLogin(string login, string password)
         {
-            string passwordEntered = password;
-            if (userRepository.Find(x => x.WorkEmailAddress == login && x.Password == passwordEntered) != null)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }            
+            return await Task.Run(() => userRepository.Find(x => x.WorkEmailAddress == login && x.Password == password) != null);
         }
     }
 }
