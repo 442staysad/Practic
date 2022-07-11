@@ -9,11 +9,6 @@ namespace Onion.Core.DTO
     {
         public string Name { get; set; }
         public string Description { get; set; }
-        public EmployeeDTO Manager { get; set; }
-        /*public IEnumerable<EmployeeDTO> EmployeesList{ get; set;}
-        public DepartmentDTO()
-        {
-            EmployeesList = new List<EmployeeDTO>();
-        }*/
+        public EmployeeDTO Manager { get; set; }  
     }
 }

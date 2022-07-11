@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Onion.Core.Entities
 {
@@ -21,12 +17,12 @@ namespace Onion.Core.Entities
         /// <summary>
         /// Внешний ключ навигационного свойства "HeadOfDepartment", или глава отдела (представлен как линейный менеджер).
         /// </summary>
-        [ForeignKey(nameof(HeadOfDepartment))]
+        [ForeignKey(nameof(Employee))]
         public int? HeadOfDepartmentId { get; set; }
 
         /// <summary>
         /// Глава отдела (линейный менеджер).
         /// </summary>
-        public Employee HeadOfDepartment { get; set; }
+        public Employee Employee { get; set; }
     }
 }
