@@ -2,7 +2,7 @@
 
 namespace Onion.Infrastructure.Migrations
 {
-    public partial class AddedEmployee_Department_Roles : Migration
+    public partial class Add_Tables_Employees_and_Departments : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -58,7 +58,9 @@ namespace Onion.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Departments_HeadOfDepartmentId",
                 table: "Departments",
-                column: "HeadOfDepartmentId");
+                column: "HeadOfDepartmentId",
+                unique: true,
+                filter: "[HeadOfDepartmentId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Employees_DepartmentId",

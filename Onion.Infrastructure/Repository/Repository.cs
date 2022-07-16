@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using Onion.Core.Entities;
 using Onion.Infrastructure.Data;
 using Onion.Core.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -87,8 +87,13 @@ namespace Onion.Infrastructure.Repository
         /// <remarks>Asynchronous</remarks>
         public async Task<int> DeleteAsync(T entity)
         {
-            _context.Set<T>().Remove(entity);
-            return await _context.SaveChangesAsync();
+            try{
+                _context.Set<T>().Remove(entity);
+                return await _context.SaveChangesAsync();
+            }
+            catch(Exception ex){
+                throw new Exception(ex.Message);
+            }
         }
 
         /// <summary>
@@ -108,9 +113,15 @@ namespace Onion.Infrastructure.Repository
         /// <remarks>Asynchronous</remarks>
         public async Task<IEnumerable<T>> DeleteRangeAsync(IEnumerable<T> entityList)
         {
-            _context.Set<T>().RemoveRange(entityList);
-            await _context.SaveChangesAsync();
-            return entityList;
+            try {
+                _context.Set<T>().RemoveRange(entityList);
+                await _context.SaveChangesAsync();
+                return entityList;
+            }
+            catch (Exception ex){
+                throw new Exception(ex.Message);
+            }
+
         }
 
         /// <summary>
