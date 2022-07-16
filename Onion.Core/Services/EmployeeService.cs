@@ -3,29 +3,34 @@ using Onion.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Security.Cryptography;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Threading.Tasks;
+using Onion.Core.DTO.Employee;
 
 namespace Onion.Core.Services
 {
     public class EmployeeService : IEmployee
     {
-        private readonly IRepository<Employee> userRepository;
+        private readonly IRepository<Employee> employeeRepository;
+        private readonly IMapper mapper;
 
-        public EmployeeService(IRepository<Employee> userRepository)
+        public EmployeeService(IRepository<Employee> employeeRepository, IMapper mapper)
         {
-            this.userRepository = userRepository;
+            this.employeeRepository = employeeRepository;
+            this.mapper = mapper;
         }
 
         public async Task<int> CurrentUserId(string login)
         {
-            var currentUser = await userRepository.FindAsync(x => x.WorkEmailAddress == login);
-            return await Task.Run(()=> currentUser == null ? 1 : currentUser.Id);
+            var currentUser = await employeeRepository.FindAsync(x => x.WorkEmailAddress == login);
+            return currentUser == null ? 1 : currentUser.Id;
         }
 
-        public async Task<bool> IsAuthenticatedLogin(string login, string password)
-        {
-            return await Task.Run(() => userRepository.Find(x => x.WorkEmailAddress == login && x.Password == password) != null);
-        }
+        public async Task<IEnumerable<EmployeeShortDTO>> GetEmployeeShortData() => 
+               await Task.Run(() => employeeRepository.GetAll().Include(r=>r.Role).Select(e => mapper.ToEmployeeShortDTO(e)).AsNoTracking().AsEnumerable());
+
+        public async Task<bool> IsAuthenticatedLogin(string login, string password) =>
+               await employeeRepository.FindAsync(x => x.WorkEmailAddress == login && x.Password == password) != null;
     }
 }

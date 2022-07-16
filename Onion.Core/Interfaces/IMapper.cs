@@ -7,9 +7,10 @@ namespace Onion.Core.Interfaces
 {
     public interface IMapper
     {
-        Task<DepartmentDTO> ToDepartmentDTO(Department department);
-        Task<Department> ToDepartment(DepartmentDTO departmentDTO, Department department = null);
-        Task<EmployeeDTO> ToEmployeeDTO(Employee employee);
-        Task<Employee> ToEmployee(EmployeeDTO employeeDTO);
+        DepartmentDTO ToDepartmentDTO(Department department);
+        Department ToDepartment(DepartmentDTO departmentDTO, Department department = null);
+        EmployeeDTO ToEmployeeDTO(Employee employee);
+        EmployeeShortDTO ToEmployeeShortDTO(Employee employee);
+        Employee ToEmployee(EmployeeUpdateDTO employeeDTO,Employee employee=null);
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Onion.Core.Entities;
+using Onion.Core.DTO.Employee;
 
 namespace Onion.Core.Interfaces
 {
@@ -11,5 +11,6 @@ namespace Onion.Core.Interfaces
         Task<bool> IsAuthenticatedLogin(string login, string password);
 
         Task<int> CurrentUserId(string login);
+        Task<IEnumerable<EmployeeShortDTO>> GetEmployeeShortData();
     }
 }
