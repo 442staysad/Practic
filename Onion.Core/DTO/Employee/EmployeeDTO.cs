@@ -11,8 +11,8 @@ namespace Onion.Core.DTO.Employee
         public string WorkPhoneNumber { get; set; }
         public string WorkEmailAddress { get; set; }
 
-        public EmployeeShortDTO EmployeeShort { get; set; }
-        public DepartmentDTO DepartmentDTO { get; set; }
+        public EmployeeShortDTO? EmployeeShort { get; set; }
+        public DepartmentDTO? DepartmentDTO { get; set; }
 
     }
 }
