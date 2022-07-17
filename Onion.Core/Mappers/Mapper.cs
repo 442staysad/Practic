@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
-using Onion.Core.DTO;
+using Onion.Core.DTO.Department;
 using Onion.Core.DTO.Employee;
+using Onion.Core.DTO.Role;
 using Onion.Core.Entities;
 using Onion.Core.Interfaces;
 

@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using Onion.Core.DTO.Employee;
+using System.Security.Cryptography;
 
 namespace Onion.Core.Services
 {
@@ -27,10 +28,42 @@ namespace Onion.Core.Services
             return currentUser == null ? 1 : currentUser.Id;
         }
 
-        public async Task<IEnumerable<EmployeeShortDTO>> GetEmployeeShortData() => 
-               await Task.Run(() => employeeRepository.GetAll().Include(r=>r.Role).Select(e => mapper.ToEmployeeShortDTO(e)).AsNoTracking().AsEnumerable());
+        public async Task EmployeeToDepartment(int employeeId, int? departmentId)
+        {
+            var employee =await employeeRepository.FindAsync(e => e.Id.Equals(employeeId));
+                employee.DepartmentId = departmentId;
 
-        public async Task<bool> IsAuthenticatedLogin(string login, string password) =>
-               await employeeRepository.FindAsync(x => x.WorkEmailAddress == login && x.Password == password) != null;
+            await employeeRepository.UpdateAsync(employee);
+        }
+
+        public async Task<IEnumerable<EmployeeDTO>> GetEmployeesList(string sortField, string filterString, string filterDirection)
+        {
+            var employees = employeeRepository.GetAll().Select(mapper.ToEmployeeDTO);
+            return await Task.Run(() => employees);
+        }
+
+        public async Task<IEnumerable<EmployeeShortDTO>> GetEmployeeShortData() => 
+               await Task.Run(() => employeeRepository.GetAll(e => e.Include(r => r.Role)).Select(mapper.ToEmployeeShortDTO));
+
+        public async Task<EmployeeDTO> GetEmployeeById(int id) => mapper.ToEmployeeDTO(await employeeRepository.FindAsync(e => e.Id.Equals(id)));
+
+        public async Task<bool> DeleteEmployee(int id)
+        {
+            var item = await employeeRepository.FindAsync(e => e.Id == id);
+
+            if (item != null)
+            {
+                await employeeRepository.DeleteAsync(item);
+                return true;
+            }
+            return false;
+        }
+
+        public async Task EditEmployee(EmployeeUpdateDTO employeeDto)
+        {
+            var employee =await employeeRepository.FindAsync(e => e.Id.Equals(employeeDto.EmployeeDTO.Id));
+            await  employeeRepository.UpdateAsync(mapper.ToEmployee(employeeDto,employee));
+        }
+
     }
 }

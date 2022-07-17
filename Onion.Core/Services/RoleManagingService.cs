@@ -3,25 +3,28 @@ using Onion.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading.Tasks;
+using Onion.Core.DTO.Role;
 
 namespace Onion.Core.Services
 {
     public class RoleManagingService : IRoleManager
     {
-        IRepository<Employee> _employeeRepository;
-        IRepository<SystemRole> _roleRepository;
+        private readonly IRepository<Employee> employeeRepository;
+        private readonly IRepository<SystemRole> roleRepository;
+        private readonly IMapper mapper;
 
-        public RoleManagingService(IRepository<Employee> employeeRepository, IRepository<SystemRole> roleRepository)
+        public RoleManagingService(IRepository<Employee> employeeRepository, IRepository<SystemRole> roleRepository, IMapper mapper)
         {
-            _employeeRepository = employeeRepository;
-            _roleRepository = roleRepository;
+            this.employeeRepository = employeeRepository;
+            this.roleRepository = roleRepository;
+            this.mapper = mapper;
         }
-        
-        public IQueryable<SystemRole> GetAllRoles()
-        {
-            IQueryable<SystemRole> allRoles = _roleRepository.GetAll();            
-            return allRoles;
+
+        public async Task<IEnumerable<RoleDTO>> GetAllRoles() 
+        { 
+            var roles = await roleRepository.GetAllAsync();
+            return roles.Select(r=>mapper.ToRoleDTO(r));
         }
     }
 }

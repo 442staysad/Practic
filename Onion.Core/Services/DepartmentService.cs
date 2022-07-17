@@ -4,10 +4,10 @@ using System.Linq.Dynamic.Core;
 using System.Data.SqlClient;
 using Onion.Core.Interfaces;
 using Onion.Core.Entities;
-using Onion.Core.DTO;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Onion.Core.DTO.Department;
 
 namespace Onion.Core.Services
 {
@@ -30,7 +30,7 @@ namespace Onion.Core.Services
             }
             else
             {
-                Department department = await _departmentRepository.FindAsync(d => d.Id == departmentDto.Id);
+                Department department = await _departmentRepository.FindAsync(d => d.Id == departmentDto.Id,d=>d.Include(e=>e.Employee));
 
                 try{
                     await _departmentRepository.UpdateAsync(_mapper.ToDepartment(departmentDto, department));
@@ -41,15 +41,20 @@ namespace Onion.Core.Services
             }
         }
 
-        public async Task DeleteDepartment(int id) 
-            => await _departmentRepository.DeleteAsync(await _departmentRepository.FindAsync(d => d.Id == id));
-
-        public async Task<DepartmentDTO> GetDepartmentById(int id) 
-            => _mapper.ToDepartmentDTO(await _departmentRepository.FindAsync(d => d.Id == id));
-
-        public async Task<IEnumerable<DepartmentDTO>> GetDepartmentsList(string sortField,string sortDirection, string filterString)
+        public async Task DeleteDepartment(int id)
         {
-            var departments =_departmentRepository.GetAll().Include(e => e.Employee).ThenInclude(r => r.Role).AsQueryable().ToList().Select(_mapper.ToDepartmentDTO);
+            var department = await _departmentRepository.FindAsync(d => d.Id == id);
+            await _departmentRepository.DeleteAsync(department);
+        }
+        public async Task<DepartmentDTO> GetDepartmentById(int id)
+        {
+            var department = await _departmentRepository.FindAsync(d => d.Id == id);
+            return _mapper.ToDepartmentDTO(department);
+        }
+        public async Task<IEnumerable<DepartmentDTO>> GetDepartmentsList(string sortField = null,string sortDirection = null, string filterString = null)
+        {
+            var departments =_departmentRepository.GetAll(d=>d.Include(e => e.Employee)
+                                                              .ThenInclude(r => r.Role)).AsQueryable().ToList().Select(_mapper.ToDepartmentDTO);
 
             if (!String.IsNullOrEmpty(filterString))
                 departments =departments.Where(d => d.Name.Contains(filterString, StringComparison.OrdinalIgnoreCase)
@@ -57,13 +62,11 @@ namespace Onion.Core.Services
 
             if (!String.IsNullOrEmpty(sortField))
                 if (sortField == "Name")
-                    departments = sortDirection == "Ascending"
-                                                    ? departments.OrderBy(d => d.Name)
-                                                    : departments.OrderByDescending(d => d.Name);
+                    departments = sortDirection == "Ascending"? departments.OrderBy(d => d.Name)
+                                                              : departments.OrderByDescending(d => d.Name);
                 else
-                    departments =sortDirection == "Ascending"
-                                                    ? departments.OrderBy(d => d.Manager.EmployeeShort.FullName)
-                                                    : departments.OrderByDescending(d => d.Manager.EmployeeShort.FullName);
+                    departments =sortDirection == "Ascending"? departments.OrderBy(d => d.Manager.EmployeeShort.FullName)
+                                                             : departments.OrderByDescending(d => d.Manager.EmployeeShort.FullName);
 
             return await Task.Run(() => departments);
         }
