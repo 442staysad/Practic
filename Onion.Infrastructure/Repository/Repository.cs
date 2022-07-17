@@ -7,6 +7,7 @@ using Onion.Infrastructure.Data;
 using Onion.Core.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Onion.Infrastructure.Repository
 {
@@ -23,8 +24,13 @@ namespace Onion.Infrastructure.Repository
         /// Gets a collection of all objects in the database
         /// </summary>
         /// <remarks>Synchronous</remarks>
-        public IQueryable<T> GetAll()=> _context.Set<T>().AsQueryable();
-        
+        public IQueryable<T> GetAll(Func<IQueryable<T>, IIncludableQueryable<T, object>> includes = null)
+        {
+            var query = _context.Set<T>().AsQueryable();
+            if (includes != null)
+                return includes(query);
+            return query;
+        }
 
         /// <summary>
         /// Gets a collection of all objects in the database
@@ -42,8 +48,13 @@ namespace Onion.Infrastructure.Repository
         /// Returns a single object which matches the provided expression
         /// </summary>
         /// <remarks>Asynchronous</remarks>
-        public async Task<T> FindAsync(Expression<Func<T, bool>> expression)=> await _context.Set<T>().SingleOrDefaultAsync(expression);
-
+        public async Task<T> FindAsync(Expression<Func<T, bool>> expression, Func<IQueryable<T>, IIncludableQueryable<T, object>> includes = null)
+        {
+            var query=_context.Set<T>().AsQueryable();
+            if (includes != null)
+                query = includes(query);
+            return await query.SingleOrDefaultAsync(expression);
+        }
         /// <summary>
         /// Returns a collection of objects which match the provided expression
         /// </summary>
