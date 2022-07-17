@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Onion.Core.DTO.Department;
+using System;
 using System.Collections.Generic;
 using System.Text;
 

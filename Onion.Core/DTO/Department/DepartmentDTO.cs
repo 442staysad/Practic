@@ -3,12 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Onion.Core.DTO
+namespace Onion.Core.DTO.Department
 {
     public class DepartmentDTO : BaseDTO
     {
         public string Name { get; set; }
         public string Description { get; set; }
-        public EmployeeDTO? Manager { get; set; }  
+        public EmployeeDTO Manager { get; set; }
     }
 }
