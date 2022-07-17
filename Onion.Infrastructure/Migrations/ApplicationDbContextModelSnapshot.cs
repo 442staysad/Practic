@@ -37,7 +37,9 @@ namespace Onion.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("HeadOfDepartmentId");
+                    b.HasIndex("HeadOfDepartmentId")
+                        .IsUnique()
+                        .HasFilter("[HeadOfDepartmentId] IS NOT NULL");
 
                     b.ToTable("Departments");
                 });
@@ -127,11 +129,11 @@ namespace Onion.Infrastructure.Migrations
 
             modelBuilder.Entity("Onion.Core.Entities.Department", b =>
                 {
-                    b.HasOne("Onion.Core.Entities.Employee", "HeadOfDepartment")
-                        .WithMany()
-                        .HasForeignKey("HeadOfDepartmentId");
+                    b.HasOne("Onion.Core.Entities.Employee", "Employee")
+                        .WithOne()
+                        .HasForeignKey("Onion.Core.Entities.Department", "HeadOfDepartmentId");
 
-                    b.Navigation("HeadOfDepartment");
+                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("Onion.Core.Entities.Employee", b =>

@@ -11,6 +11,8 @@ using Onion.Core.Entities;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Onion.Core.Services;
+using Onion.Core.Mappers;
+using Onion.Web.Mappers;
 
 namespace Onion.Web
 {
@@ -30,10 +32,14 @@ namespace Onion.Web
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             // check path!!
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
-                            options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login"));
+            /*services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
+                            options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login"));*/
+
             services.AddScoped(typeof(IRepository<>),typeof(Repository<>));
             services.AddScoped<IEmployee, EmployeeService>();
+            services.AddScoped<IDepartment, DepartmentService>();
+            services.AddSingleton(typeof(IMapper), typeof(Mapper));
+            services.AddSingleton(typeof(WebMapper));
             services.AddControllersWithViews();
         }
 

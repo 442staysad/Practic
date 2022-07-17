@@ -1,0 +1,62 @@
+﻿@model EditEmployeeModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Изменить </h1>
+
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="CreateOrEdit" asp-controller="Department">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="FirstName" class="control-label"></label>
+                <input asp-for="FirstName" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="LastName" class="control-label"></label>
+                <input asp-for="LastName" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Patronymic" class="control-label"></label>
+                <input asp-for="Patronymic" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="WorkEmailAddress" class="control-label"></label>
+                <input asp-for="WorkEmailAddress" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="WorkPhoneNumber" class="control-label"></label>
+                <input asp-for="WorkPhoneNumber" class="form-control" />
+                <span asp-validation-for="WorkPhoneNumber" class="text-danger"></span>
+            </div>
+             <div class="form-group">
+                @Html.DropDownListFor(m => m.RoleId, Model.Roles,new {@class= "form-control"})
+            </div>
+            <div class="form-group">
+                @Html.DropDownListFor(m => m.DepartmentId, Model.Departments,new {@class= "form-control"})
+            </div>
+            <div class="form-group">
+                <label asp-for="Password" class="control-label"></label>
+                <input asp-for="Password" class="form-control" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Сохранить" class="btn btn-primary btn-block" />
+            </div>
+            <div class="form-group">
+                <a class="btn btn-outline-danger" asp-action="Delete" asp-route-Id="@Model.Id">Удалить</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a class="btn btn-outline-secondary btn-outline-primary" asp-action="Index">Назад к списку</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

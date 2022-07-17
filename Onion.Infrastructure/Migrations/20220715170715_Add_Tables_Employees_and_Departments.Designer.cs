@@ -10,8 +10,8 @@ using Onion.Infrastructure.Data;
 namespace Onion.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220708204139_AddedEmployee_Department_Roles")]
-    partial class AddedEmployee_Department_Roles
+    [Migration("20220715170715_Add_Tables_Employees_and_Departments")]
+    partial class Add_Tables_Employees_and_Departments
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -39,7 +39,9 @@ namespace Onion.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("HeadOfDepartmentId");
+                    b.HasIndex("HeadOfDepartmentId")
+                        .IsUnique()
+                        .HasFilter("[HeadOfDepartmentId] IS NOT NULL");
 
                     b.ToTable("Departments");
                 });
@@ -129,11 +131,11 @@ namespace Onion.Infrastructure.Migrations
 
             modelBuilder.Entity("Onion.Core.Entities.Department", b =>
                 {
-                    b.HasOne("Onion.Core.Entities.Employee", "HeadOfDepartment")
-                        .WithMany()
-                        .HasForeignKey("HeadOfDepartmentId");
+                    b.HasOne("Onion.Core.Entities.Employee", "Employee")
+                        .WithOne()
+                        .HasForeignKey("Onion.Core.Entities.Department", "HeadOfDepartmentId");
 
-                    b.Navigation("HeadOfDepartment");
+                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("Onion.Core.Entities.Employee", b =>
