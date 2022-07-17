@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Onion.Core.Interfaces;
-using Onion.Web.Models;
 using Onion.Web.ViewModels;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -12,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System;
 using Onion.Web.Mappers;
+using Onion.Web.Models.Department;
 
 namespace Onion.Web.Controllers
 {

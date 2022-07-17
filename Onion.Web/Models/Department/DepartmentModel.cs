@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Onion.Core.DTO.Employee;
 
-namespace Onion.Web.ViewModels
+namespace Onion.Web.Models.Department
 {
     public class DepartmentModel
     {

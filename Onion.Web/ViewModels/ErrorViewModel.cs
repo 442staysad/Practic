@@ -1,6 +1,6 @@
 using System;
 
-namespace Onion.Web.Models
+namespace Onion.Web.ViewModels
 {
     public class ErrorViewModel
     {

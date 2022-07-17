@@ -1,0 +1,40 @@
+﻿@model DepartmentModel
+@{
+}
+<h1>@Model.Name</h1>
+
+<div class="list-group">
+    <ul class="list-unstyled">
+        <li>
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title text-primary">Описание: @Model.Description</h2>
+                        <div class="col-md-6 float-md-left">
+                            @foreach (var item in @Model.Employees)
+                            {
+                                <div class="card mb-2 shadow" style="height:11rem!important">
+                                    <div class="row no-gutters">
+                                        <div class="col-md-4 text-center p-4">
+                                            <img src="" class="card-img w-75 rounded-circle shadow" style="height:8rem!important" alt="@item.LastName">
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <h5 class="card-title">@item.FullName</h5>
+                                                <p class="card-text">
+                                                    <span class="badge badge-info">İletişim:&nbsp;</span>
+                                                    <small class="text-muted">@item.</small>
+                                                    <a asp-action="RemoveFromDepartment" asp-route-departmentId="@item.Id" asp-route-employeeId="@Model.Id"
+                                                        class="btn btn-primary text-white float-right mt-2 btn-sm"><b>Убрать</b></a>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    <a class="btn btn-outline-secondary btn-outline-primary" asp-action="Index">Назад к списку</a>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>
