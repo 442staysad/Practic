@@ -1,13 +1,11 @@
-﻿using Onion.Core.Entities;
-using System;
+﻿using Onion.Core.DTO.Role;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Onion.Core.Interfaces
 {
     public interface IRoleManager
     {
-        public IQueryable<SystemRole> GetAllRoles();
+        Task<IEnumerable<RoleDTO>> GetAllRoles();
     }
 }

@@ -4,15 +4,16 @@ using Onion.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Onion.Core.Interfaces
 {
     public interface IRepository<T> where T:BaseEntity
     {
-        IQueryable<T> GetAll();
+        IQueryable<T> GetAll(Func<IQueryable<T>, IIncludableQueryable<T, object>> includes = null);
         Task<IEnumerable<T>> GetAllAsync();
         T Find(Expression<Func<T, bool>> expression);
-        Task<T> FindAsync(Expression<Func<T, bool>> expression);
+        Task<T> FindAsync(Expression<Func<T, bool>> expression, Func<IQueryable<T>, IIncludableQueryable<T, object>> includes = null);
         IQueryable<T> FindAll(Func<IQueryable<T>, IQueryable<T>> func);
         Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> expression);
         Task<T> AddAsync(T entity);

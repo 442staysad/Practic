@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Onion.Core.Entities;
-using Onion.Core.DTO;
+using Onion.Core.DTO.Department;
 
 namespace Onion.Core.Interfaces
 {
@@ -14,8 +14,8 @@ namespace Onion.Core.Interfaces
         Task DeleteDepartment(int id);
         Task<DepartmentDTO> GetDepartmentById(int id);
         Task<IEnumerable<DepartmentDTO>> GetDepartmentsList(
-            string sortField,
-            string sortDirection,
-            string filterSting);
+            string sortField=null,
+            string sortDirection=null,
+            string filterSting = null);
     }
 }

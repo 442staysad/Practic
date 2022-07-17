@@ -1,7 +1,8 @@
 ﻿using Onion.Core.Entities;
-using Onion.Core.DTO;
 using Onion.Core.DTO.Employee;
 using System.Threading.Tasks;
+using Onion.Core.DTO.Department;
+using Onion.Core.DTO.Role;
 
 namespace Onion.Core.Interfaces
 {
@@ -12,5 +13,6 @@ namespace Onion.Core.Interfaces
         EmployeeDTO ToEmployeeDTO(Employee employee);
         EmployeeShortDTO ToEmployeeShortDTO(Employee employee);
         Employee ToEmployee(EmployeeUpdateDTO employeeDTO,Employee employee=null);
+        RoleDTO ToRoleDTO(SystemRole systemRole);
     }
 }
