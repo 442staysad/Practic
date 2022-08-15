@@ -8,10 +8,11 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Onion.Core.DTO.Department;
+using Onion.Core.Interfaces.Services;
 
 namespace Onion.Core.Services
 {
-    public class DepartmentService : IDepartment
+    public class DepartmentService : IDepartmentService
     {
         private readonly IRepository<Department> _departmentRepository;
         private readonly IMapper _mapper;
@@ -22,22 +23,27 @@ namespace Onion.Core.Services
             _mapper = mapper;
         }
 
-        public async Task CreateOrUpdateDepartment(DepartmentDTO departmentDto)
+        public async Task Create(DepartmentDTO departmentDto)
         {
-            if (departmentDto.Id == null)
-            {
-                await _departmentRepository.AddAsync( _mapper.ToDepartment(departmentDto));
+            try{
+                await _departmentRepository.AddAsync(_mapper.ToDepartment(departmentDto));
             }
-            else
-            {
-                Department department = await _departmentRepository.FindAsync(d => d.Id == departmentDto.Id,d=>d.Include(e=>e.Employee));
+            catch(Exception ex){
+                throw new ArgumentException(ex.InnerException.Message);
+            }
+        }
 
-                try{
-                    await _departmentRepository.UpdateAsync(_mapper.ToDepartment(departmentDto, department));
-                }
-                catch{
-                    throw new ArgumentException(nameof(department));
-                }
+        public async Task Update(DepartmentDTO departmentDto)
+        {
+            try
+            {
+
+                Department department = await _departmentRepository.FindAsync(d => d.Id.Equals(departmentDto.Id), d => d.Include(e => e.Employee));
+                await _departmentRepository.UpdateAsync(_mapper.ToDepartment(departmentDto, department));
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException(ex.InnerException.Message);
             }
         }
 
@@ -46,11 +52,13 @@ namespace Onion.Core.Services
             var department = await _departmentRepository.FindAsync(d => d.Id == id);
             await _departmentRepository.DeleteAsync(department);
         }
+
         public async Task<DepartmentDTO> GetDepartmentById(int id)
         {
-            var department = await _departmentRepository.FindAsync(d => d.Id == id);
+            var department = await _departmentRepository.FindAsync(d => d.Id.Equals(id),e=>e.Include(d=>d.Employee).ThenInclude(r=>r.Role));
             return _mapper.ToDepartmentDTO(department);
         }
+
         public async Task<IEnumerable<DepartmentDTO>> GetDepartmentsList(string sortField = null,string sortDirection = null, string filterString = null)
         {
             var departments =_departmentRepository.GetAll(d=>d.Include(e => e.Employee)
@@ -58,15 +66,15 @@ namespace Onion.Core.Services
 
             if (!String.IsNullOrEmpty(filterString))
                 departments =departments.Where(d => d.Name.Contains(filterString, StringComparison.OrdinalIgnoreCase)
-                                                || d.Manager.EmployeeShort.FullName.Contains(filterString,StringComparison.OrdinalIgnoreCase));
+                                                || d.Manager.FullName.Contains(filterString,StringComparison.OrdinalIgnoreCase));
 
             if (!String.IsNullOrEmpty(sortField))
                 if (sortField == "Name")
                     departments = sortDirection == "Ascending"? departments.OrderBy(d => d.Name)
                                                               : departments.OrderByDescending(d => d.Name);
                 else
-                    departments =sortDirection == "Ascending"? departments.OrderBy(d => d.Manager.EmployeeShort.FullName)
-                                                             : departments.OrderByDescending(d => d.Manager.EmployeeShort.FullName);
+                    departments =sortDirection == "Ascending"? departments.OrderBy(d => d.Manager.FullName)
+                                                             : departments.OrderByDescending(d => d.Manager.FullName);
 
             return await Task.Run(() => departments);
         }

@@ -4,10 +4,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Onion.Core.DTO.Employee;
 using System.Security.Cryptography;
+using Onion.Core.Interfaces.Services;
 
 namespace Onion.Core.Services
 {
-    public class AccountService:IAccount
+    public class AccountService:IAccountService
     {
         private readonly IRepository<Employee> employeeRepository;
         private readonly IMapper mapper;
@@ -21,10 +22,10 @@ namespace Onion.Core.Services
         public async Task<bool> IsAuthenticatedLogin(string login, string password) =>
                await employeeRepository.FindAsync(x => x.WorkEmailAddress == login && x.Password == password) != null;
 
-        public async Task Register(EmployeeUpdateDTO employeeDto)
+        public async Task Register(PasswordEditDTO employeeDto)
         {
             employeeDto.Password = GetMD5HashData(employeeDto.Password);
-            await employeeRepository.AddAsync(mapper.ToEmployee(employeeDto));
+            await employeeRepository.AddAsync(mapper.ToEmployee(employeeDto.EmployeeDTO, employeeDto.Password));
         }
 
         /// <summary>

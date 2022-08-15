@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Onion.Core.DTO.Role;
+using Onion.Core.Interfaces.Services;
 
 namespace Onion.Core.Services
 {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Onion.Core.Interfaces
+namespace Onion.Core.Interfaces.Services
 {
     public interface IRoleManager
     {

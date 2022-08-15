@@ -4,12 +4,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Onion.Core.DTO.Employee;
 
-namespace Onion.Core.Interfaces
+namespace Onion.Core.Interfaces.Services
 {
-    public interface IAccount
+    public interface IAccountService
     {
         Task<bool> IsAuthenticatedLogin(string login, string password);
-        Task Register(EmployeeUpdateDTO employeeDto);
+        Task Register(PasswordEditDTO employeeDto);
         string GetMD5HashData(string input);
     }
 }
