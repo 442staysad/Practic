@@ -33,7 +33,7 @@ namespace Onion.Core.Services
             }
             catch (Exception ex)
             {
-                throw new ArgumentException(ex.InnerException.Message);
+                throw new ArgumentException(ex.Message);
             }
         }
 
@@ -64,6 +64,16 @@ namespace Onion.Core.Services
             }
         }
 
+        private async Task EndProjects()
+        {
+            var projects = await projectRepository.FindAllAsync(p=>p.EndDate<=DateTime.Now);
+            foreach(var item in projects)
+            {
+                item.Status = "Окончен";
+                await projectRepository.UpdateAsync(item);
+            }
+        }
+
         public async Task<ProjectDTO> GetProjectById(int id) 
         {
             var project = await projectRepository.FindAsync(p => p.Id.Equals(id), p => p.Include(l=>l.LineManager)
@@ -73,6 +83,8 @@ namespace Onion.Core.Services
                                                                                         .ThenInclude(r => r.Role));
             return mapper.ToProjectDTO(project);
         }
+
+
         public async Task<IEnumerable<ProjectDTO>> GetProjectsList(string sortField=null, 
                                                                     string sortDirection=null, 
                                                                     string filterString = null, 
@@ -83,6 +95,8 @@ namespace Onion.Core.Services
                                                         .Include(e=>e.Employees).ThenInclude(r=>r.Employee)
                                                         .ThenInclude(r=>r.Role)).AsQueryable().ToList()
                                                         .Select(p=>mapper.ToProjectDTO(p));
+            if (projects.Any(p => p.EndDate <= DateTime.Now))
+                EndProjects();
 
             if (!String.IsNullOrEmpty(filterString))
                 projects = projects.Where(p => p.Name.Contains(filterString, StringComparison.OrdinalIgnoreCase)
@@ -90,7 +104,8 @@ namespace Onion.Core.Services
             if (startDate.HasValue)
                 projects = projects.Where(p => p.StartDate.Value >= startDate);
             if (endDate.HasValue)
-                projects = projects.Where(p => p.StartDate.Value <= endDate);
+                projects = projects.Where(p => p.EndDate.Value <= endDate);
+
 
 
             if (!String.IsNullOrEmpty(sortField))

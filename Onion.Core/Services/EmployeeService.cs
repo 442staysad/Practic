@@ -19,6 +19,7 @@ namespace Onion.Core.Services
         private readonly IMapper mapper;
         private readonly IAccountService accountService;
 
+
         public EmployeeService(IRepository<Employee> employeeRepository, IRepository<Department> departmentRepository, IMapper mapper, IAccountService accountService)
         {
             this.employeeRepository = employeeRepository;
@@ -79,18 +80,17 @@ namespace Onion.Core.Services
             return employees.Select(e=>mapper.ToEmployeeDTO(e));
         }
 
-        public async Task RemoveFromDepartment(int id)
+        public async Task<IEnumerable<EmployeeDTO>> PopolateChart(int? depId=null,int? projId=null)
         {
-            try
-            {
-                var employee = await employeeRepository.FindAsync(e => e.Id.Equals(id));
-                employee.DepartmentId = null;
-                await employeeRepository.UpdateAsync(employee);
-            }
-            catch (Exception ex)
-            {
-                throw new ArgumentException(ex.InnerException.Message);
-            }
+            var employees = employeeRepository.GetAll(e=>
+                            e.Include(p=>p.Projects).ThenInclude(p=>p.Project).ThenInclude(e=>e.LineManager).ThenInclude(r=>r.Role)
+                             .Include(p=>p.Projects).ThenInclude(e=>e.Employee).ThenInclude(r=>r.Role)
+                             .Include(d=>d.Department).Include(r=>r.Role)).ToList().Select(mapper.ToEmployeeDTO);
+            if (depId != null)
+                employees = employees.Where(e => e.DepartmentDTO!=null&&e.DepartmentDTO.Id.Equals(depId));
+            if (projId != null)
+                    employees = employees.Where(e => e.EmployeeProjects!=null&& e.EmployeeProjects.Any(p=>p.Id.Equals(projId)));
+            return await Task.Run(() => employees);
         }
 
         public async Task<IEnumerable<EmployeeDTO>> GetEmployeesList(string sortField = null, string sortDirection = null, string filterString = null)

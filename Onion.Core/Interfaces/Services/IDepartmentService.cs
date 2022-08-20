@@ -12,6 +12,7 @@ namespace Onion.Core.Interfaces.Services
         Task Create(DepartmentDTO projectDTO);
         Task Update(DepartmentDTO projectDTO);
         Task DeleteDepartment(int id);
+        Task RemoveFromDepartment(int empId);
         Task<DepartmentDTO> GetDepartmentById(int id);
         Task<IEnumerable<DepartmentDTO>> GetDepartmentsList(string sortField = null,
                                                             string sortDirection = null,

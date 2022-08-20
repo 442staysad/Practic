@@ -14,19 +14,21 @@ namespace Onion.Core.Services
 {
     public class DepartmentService : IDepartmentService
     {
-        private readonly IRepository<Department> _departmentRepository;
-        private readonly IMapper _mapper;
+        private readonly IRepository<Employee> employeeRepository;
+        private readonly IRepository<Department> departmentRepository;
+        private readonly IMapper mapper;
 
-        public DepartmentService(IRepository<Department> departmentRepository, IMapper mapper)
+        public DepartmentService(IRepository<Department> departmentRepository, IMapper mapper,IRepository<Employee> employeeRepository)
         {
-            _departmentRepository = departmentRepository;
-            _mapper = mapper;
+            this.employeeRepository = employeeRepository;
+            this.departmentRepository = departmentRepository;
+            this.mapper = mapper;
         }
 
         public async Task Create(DepartmentDTO departmentDto)
         {
             try{
-                await _departmentRepository.AddAsync(_mapper.ToDepartment(departmentDto));
+                await departmentRepository.AddAsync(mapper.ToDepartment(departmentDto));
             }
             catch(Exception ex){
                 throw new ArgumentException(ex.InnerException.Message);
@@ -37,9 +39,22 @@ namespace Onion.Core.Services
         {
             try
             {
+                Department department =await departmentRepository.FindAsync(d=>d.Id.Equals(departmentDto.Id));
 
-                Department department = await _departmentRepository.FindAsync(d => d.Id.Equals(departmentDto.Id), d => d.Include(e => e.Employee));
-                await _departmentRepository.UpdateAsync(_mapper.ToDepartment(departmentDto, department));
+                if (department.HeadOfDepartmentId.HasValue&&department.HeadOfDepartmentId!=departmentDto.Manager.Id)
+                {
+                    Employee currentManager = await employeeRepository.FindAsync(e => e.Id.Equals(department.HeadOfDepartmentId));
+                    await RemoveFromDepartment(currentManager.Id);
+                }
+                await departmentRepository.UpdateAsync(mapper.ToDepartment(departmentDto, department));
+
+                if (departmentDto.Manager.Id.HasValue)
+                {
+                    Employee newManager = await employeeRepository.FindAsync(e => e.Id.Equals(departmentDto.Manager.Id));
+                    newManager.DepartmentId = department.Id;
+                    await employeeRepository.UpdateAsync(newManager);
+                }
+
             }
             catch (Exception ex)
             {
@@ -49,20 +64,34 @@ namespace Onion.Core.Services
 
         public async Task DeleteDepartment(int id)
         {
-            var department = await _departmentRepository.FindAsync(d => d.Id == id);
-            await _departmentRepository.DeleteAsync(department);
+            var department = await departmentRepository.FindAsync(d => d.Id == id);
+            await departmentRepository.DeleteAsync(department);
+        }
+
+        public async Task RemoveFromDepartment(int empId)
+        {
+            try
+            {
+                var employee = await employeeRepository.FindAsync(e => e.Id.Equals(empId));
+                employee.DepartmentId = null;
+                await employeeRepository.UpdateAsync(employee);
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException(ex.InnerException.Message);
+            }
         }
 
         public async Task<DepartmentDTO> GetDepartmentById(int id)
         {
-            var department = await _departmentRepository.FindAsync(d => d.Id.Equals(id),e=>e.Include(d=>d.Employee).ThenInclude(r=>r.Role));
-            return _mapper.ToDepartmentDTO(department);
+            var department = await departmentRepository.FindAsync(d => d.Id.Equals(id),e=>e.Include(d=>d.Employee).ThenInclude(r=>r.Role));
+            return mapper.ToDepartmentDTO(department);
         }
 
         public async Task<IEnumerable<DepartmentDTO>> GetDepartmentsList(string sortField = null,string sortDirection = null, string filterString = null)
         {
-            var departments =_departmentRepository.GetAll(d=>d.Include(e => e.Employee)
-                                                              .ThenInclude(r => r.Role)).AsQueryable().ToList().Select(_mapper.ToDepartmentDTO);
+            var departments =departmentRepository.GetAll(d=>d.Include(e => e.Employee)
+                                                              .ThenInclude(r => r.Role)).AsQueryable().ToList().Select(mapper.ToDepartmentDTO);
 
             if (!String.IsNullOrEmpty(filterString))
                 departments =departments.Where(d => d.Name.Contains(filterString, StringComparison.OrdinalIgnoreCase)

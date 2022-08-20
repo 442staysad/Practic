@@ -10,7 +10,6 @@ namespace Onion.Core.Interfaces.Services
     {
         Task<int> CurrentUserId(string login);
         Task<bool> DeleteEmployee(int id);
-        Task RemoveFromDepartment(int id);
         Task EmployeeToDepartment(int employeeId, int? departmentId);
         Task EditEmployee(PasswordEditDTO employeeDto);
         Task<IEnumerable<EmployeeDTO>> GetEmployeesList(string sortField = null,
@@ -19,5 +18,6 @@ namespace Onion.Core.Interfaces.Services
         Task<IEnumerable<EmployeeShortDTO>> GetEmployeeShortData();
         Task<IEnumerable<EmployeeDTO>> GetEmployeesByDepartmentId(int id);
         Task<EmployeeDTO> GetEmployeeById(int id);
+        Task<IEnumerable<EmployeeDTO>> PopolateChart(int? depId = null, int? projId = null);
     }
 }

@@ -11,5 +11,6 @@ namespace Onion.Core.Interfaces.Services
         Task<bool> IsAuthenticatedLogin(string login, string password);
         Task Register(PasswordEditDTO employeeDto);
         string GetMD5HashData(string input);
+        Task<EmployeeDTO> GetUserByUsername(string username);
     }
 }
