@@ -23,5 +23,6 @@ namespace Onion.Core.Entities
         public string PrivateEmailAddress { get; set; }
         public string WorkEmailAddress { get; set; }
         public string Password { get; set; }
+        public virtual ICollection<ProjectEmployees>? Projects { get; set; }
     }
 }

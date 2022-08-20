@@ -53,7 +53,7 @@ namespace Onion.Infrastructure.Repository
             var query=_context.Set<T>().AsQueryable();
             if (includes != null)
                 query = includes(query);
-            return await query.SingleOrDefaultAsync(expression);
+            return await query.FirstOrDefaultAsync(expression);
         }
         /// <summary>
         /// Returns a collection of objects which match the provided expression

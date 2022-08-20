@@ -9,6 +9,6 @@ namespace Onion.Core.DTO.Department
     {
         public string Name { get; set; }
         public string Description { get; set; }
-        public EmployeeDTO Manager { get; set; }
+        public EmployeeShortDTO Manager { get; set; }
     }
 }

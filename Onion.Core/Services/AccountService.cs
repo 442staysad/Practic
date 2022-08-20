@@ -4,10 +4,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Onion.Core.DTO.Employee;
 using System.Security.Cryptography;
+using Onion.Core.Interfaces.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace Onion.Core.Services
 {
-    public class AccountService:IAccount
+    public class AccountService:IAccountService
     {
         private readonly IRepository<Employee> employeeRepository;
         private readonly IMapper mapper;
@@ -19,13 +21,17 @@ namespace Onion.Core.Services
         }
 
         public async Task<bool> IsAuthenticatedLogin(string login, string password) =>
-               await employeeRepository.FindAsync(x => x.WorkEmailAddress == login && x.Password == password) != null;
+               await employeeRepository.FindAsync(x => x.WorkEmailAddress == login && x.Password == GetMD5HashData(password.ToString())) != null;
 
-        public async Task Register(EmployeeUpdateDTO employeeDto)
+        public async Task Register(PasswordEditDTO employeeDto)
         {
             employeeDto.Password = GetMD5HashData(employeeDto.Password);
-            await employeeRepository.AddAsync(mapper.ToEmployee(employeeDto));
+            await employeeRepository.AddAsync(mapper.ToEmployee(employeeDto.EmployeeDTO, employeeDto.Password));
         }
+
+        public async Task<EmployeeDTO> GetUserByUsername(string username)
+            => mapper.ToEmployeeDTO( await employeeRepository.FindAsync(e=>e.WorkEmailAddress.Equals(username),
+                                    d=>d.Include(r=>r.Role).Include(d=>d.Department).Include(p=>p.Projects).ThenInclude(p=>p.Project)));
 
         /// <summary>
         /// take any string and encrypt it using MD5 then

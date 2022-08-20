@@ -10,8 +10,8 @@ using Onion.Infrastructure.Data;
 namespace Onion.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220715170715_Add_Tables_Employees_and_Departments")]
-    partial class Add_Tables_Employees_and_Departments
+    [Migration("20220810142900_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -92,6 +92,56 @@ namespace Onion.Infrastructure.Migrations
                     b.ToTable("Employees");
                 });
 
+            modelBuilder.Entity("Onion.Core.Entities.Project", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<decimal?>("Cost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("LineManagerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LineManagerId");
+
+                    b.ToTable("Projects");
+                });
+
+            modelBuilder.Entity("Onion.Core.Entities.ProjectEmployees", b =>
+                {
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProjectId", "EmployeeId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("ProjectEmployees");
+                });
+
             modelBuilder.Entity("Onion.Core.Entities.SystemRole", b =>
                 {
                     b.Property<int>("Id")
@@ -120,11 +170,6 @@ namespace Onion.Infrastructure.Migrations
                         new
                         {
                             Id = 3,
-                            RoleName = "TeamLeader"
-                        },
-                        new
-                        {
-                            Id = 4,
                             RoleName = "User"
                         });
                 });
@@ -153,6 +198,44 @@ namespace Onion.Infrastructure.Migrations
                     b.Navigation("Department");
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("Onion.Core.Entities.Project", b =>
+                {
+                    b.HasOne("Onion.Core.Entities.Employee", "LineManager")
+                        .WithMany()
+                        .HasForeignKey("LineManagerId");
+
+                    b.Navigation("LineManager");
+                });
+
+            modelBuilder.Entity("Onion.Core.Entities.ProjectEmployees", b =>
+                {
+                    b.HasOne("Onion.Core.Entities.Employee", "Employee")
+                        .WithMany("Projects")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Onion.Core.Entities.Project", "Project")
+                        .WithMany("Employees")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("Onion.Core.Entities.Employee", b =>
+                {
+                    b.Navigation("Projects");
+                });
+
+            modelBuilder.Entity("Onion.Core.Entities.Project", b =>
+                {
+                    b.Navigation("Employees");
                 });
 #pragma warning restore 612, 618
         }

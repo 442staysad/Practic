@@ -12,7 +12,6 @@ namespace Onion.Web.Models.Employee
 
         [Required(ErrorMessage = "Введите пароль")]
         [StringLength(50, MinimumLength = 7, ErrorMessage = "Длина может быть от 7 до 50 символов включительно.")]
-        [DataType(DataType.Password)]
         public string Password { get; set; }
     }
 }
