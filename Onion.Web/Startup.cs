@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Onion.Core.Services;
 using Onion.Core.Mappers;
 using Onion.Web.Mappers;
+using Onion.Core.Interfaces.Services;
 
 namespace Onion.Web
 {
@@ -31,13 +32,15 @@ namespace Onion.Web
 
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            // check path!!
-            /*services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
-                            options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login"));*/
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
+                            options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login"));
 
             services.AddScoped(typeof(IRepository<>),typeof(Repository<>));
-            services.AddScoped<IEmployee, EmployeeService>();
-            services.AddScoped<IDepartment, DepartmentService>();
+            services.AddScoped(typeof(IRoleManager), typeof(RoleManagingService));
+            services.AddScoped(typeof(IEmployeeService), typeof(EmployeeService));
+            services.AddScoped(typeof(IDepartmentService),typeof(DepartmentService));
+            services.AddScoped(typeof(IAccountService), typeof(AccountService));
+            services.AddScoped(typeof(IProjectService), typeof(ProjectService));
             services.AddSingleton(typeof(IMapper), typeof(Mapper));
             services.AddSingleton(typeof(WebMapper));
             services.AddControllersWithViews();
@@ -65,7 +68,7 @@ namespace Onion.Web
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Account}/{action=Login}/{id?}");
             });
         }
     }

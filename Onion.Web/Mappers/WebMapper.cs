@@ -5,41 +5,73 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Onion.Web.Models.Employee;
+using Onion.Web.Models.Project;
 using Onion.Web.Models.Department;
 using Onion.Core.DTO.Department;
 using Onion.Core.DTO.Role;
+using Onion.Core.DTO.Project;
 
 namespace Onion.Web.Mappers
 {
     public class WebMapper
     {
-        public DepartmentDTO ToDepartmentDTO(CreateDepartmentModel departmentModel) => new DepartmentDTO
+        public DepartmentDTO ToDepartmentDTO(DepartmentModel departmentModel) => new DepartmentDTO
         {
+            Id=departmentModel.Id,
             Name = departmentModel.Name,
             Description = departmentModel.Description,
-            Manager = new EmployeeDTO
+            Manager = new EmployeeShortDTO
             {
                 Id = departmentModel.HeadOfDepartmentId
 
             }
         };
 
-        public EditDepartmentModel ToEditDepartmentModel(DepartmentDTO departmentDTO) => new EditDepartmentModel
+        public ProjectDTO CreateToProjectDTO(ProjectModel model) => new ProjectDTO
         {
-            Id = (int)departmentDTO.Id,
-            Name = departmentDTO.Name,
-            Description = departmentDTO.Description,
-            HeadOfDepartmentId = departmentDTO.Manager.Id
+            Name = model.Name,
+            Description = model.Description,
+            Status = model.Status,
+            Cost = model.Cost,
+            StartDate = model.StartDate,
+            EndDate = model.EndDate,
+            ProjectEmployees = model.ProjectEmployeesIds.Select(e=>new EmployeeDTO { Id=e}),
+            LineManager = new EmployeeShortDTO {Id=model.LineManagerId }
         };
 
-        public EmployeeUpdateDTO ToEmployeeUpdateDTO(RegisterModel model) => new EmployeeUpdateDTO
+        public DepartmentModel ToDepartmentModel(DepartmentDTO departmentDTO = null,
+                                                IEnumerable<EmployeeShortDTO> employees = null,
+                                                IEnumerable<EmployeeDTO> departmentEmployees=null)
+        {
+            DepartmentModel model = new DepartmentModel
+            {
+                HeadOfDepartment = employees.Where(e=>e.Role.Id.Equals(2)),
+            };
+            if (departmentDTO != null)
+            {
+                model.Id = departmentDTO.Id;
+                model.Name = departmentDTO.Name;
+                model.Description = departmentDTO.Description;
+                model.HeadOfDepartmentId = departmentDTO.Manager.Id;
+
+                if (departmentEmployees.Count() > 0)
+                    model.DepartmentEmployees = departmentEmployees;
+            }
+            
+            return model;
+        }
+
+
+        public PasswordEditDTO ToEmployeeUpdateDTO(EmployeeModel model) => new PasswordEditDTO
         {
             Password = model.Password,
             EmployeeDTO = new EmployeeDTO
             {
+                PrivateEmailAddress = model.PrivateEmailAddress,
+                PrivatePhoneNumber = model.PrivatePhoneNumber,
                 WorkEmailAddress = model.WorkEmailAddress,
                 WorkPhoneNumber = model.WorkPhoneNumber,
-                EmployeeShort = new EmployeeShortDTO
+                PersonalData = new EmployeeShortDTO
                 {
                     FirstName = model.FirstName,
                     LastName = model.LastName,
@@ -56,40 +88,79 @@ namespace Onion.Web.Mappers
             }
         };
 
-        public RegisterModel ToRegisterModel(IEnumerable<RoleDTO> roles, IEnumerable<DepartmentDTO> departments) => new RegisterModel
+        public EmployeeModel ToRegisterModel(IEnumerable<RoleDTO> roles, IEnumerable<DepartmentDTO> departments) => new EmployeeModel
         {
-            Roles = roles.Select(e => new SelectListItem
-            {
-                Value = e.Id.ToString(),
-                Text = e.RoleName
-            }),
-            Departments = departments.Select(d => new SelectListItem
-            {
-                Value = d.Id.ToString(),
-                Text = d.Name
-            })
+            Roles = roles,
+            Departments = departments
         };
 
-        public EditEmployeeModel ToEditEmployeeModel(EmployeeDTO employee,IEnumerable<RoleDTO> roles, IEnumerable<DepartmentDTO> departments) => new EditEmployeeModel
+        public ProjectDTO ToProjectDTO(ProjectModel model) 
         {
-            Id = (int)employee.Id,
-            FirstName = employee.EmployeeShort.FirstName,
-            LastName = employee.EmployeeShort.LastName,
-            Patronymic = employee.EmployeeShort.Patronymic,
-            WorkEmailAddress = employee.WorkEmailAddress,
-            WorkPhoneNumber = employee.WorkPhoneNumber,
-            Roles = roles.Select(r => new SelectListItem
+            ProjectDTO project = new ProjectDTO
             {
-                Value = r.Id.ToString(),
-                Text = r.RoleName
-            }),
-            Departments = departments.Select(d => new SelectListItem
+                Id = model.Id,
+                Name = model.Name,
+                Description = model.Description,
+                Status = model.Status,
+                Cost = model.Cost,
+                EndDate = model.EndDate,
+                StartDate = model.StartDate,
+            };
+            project.LineManager = new EmployeeShortDTO { Id = model.LineManagerId };
+            if (model.ProjectEmployeesIds != null)
             {
-                Value = d.Id.ToString(),
-                Text = d.Name
-            })
+                project.ProjectEmployees = model.ProjectEmployeesIds.Select(i=>new EmployeeDTO { Id=i});
+            }
+            return project;
+        }
 
-        };
+        public ProjectModel ToProjectModel(IEnumerable<EmployeeShortDTO> employees = null, ProjectDTO projectDTO = null)
+        {
+            ProjectModel model = new ProjectModel {
+                LineManager = employees.Where(e=>e.Role.Id.Equals(2)),
+                Employees = employees.Where(e => !e.Role.Id.Equals(2))
+            };
+
+            if (projectDTO != null)
+            {
+                model.Id = projectDTO.Id;
+                model.Name = projectDTO.Name;
+                model.StartDate = projectDTO.StartDate;
+                model.EndDate = projectDTO.EndDate;
+                model.Status = projectDTO.Status;
+                model.Cost = projectDTO.Cost;
+                model.Description = projectDTO.Description;
+                if (projectDTO.LineManager != null)
+                {
+                    model.LineManagerId = projectDTO.LineManager.Id;
+                }
+                model.ProjectEmployeesIds = new List<int>();
+                if (projectDTO.ProjectEmployees.Count() != 0)
+                    model.ProjectEmployeesIds = projectDTO.ProjectEmployees.Select(p => (int)p.Id).ToList();
+            }
+            return model;
+        }
+
+        public EmployeeModel ToEmployeeModel(EmployeeDTO employee,IEnumerable<RoleDTO> roles, IEnumerable<DepartmentDTO> departments)
+        {
+            EmployeeModel model = new EmployeeModel
+            {
+                Id = employee.Id,
+                FirstName = employee.PersonalData.FirstName,
+                LastName = employee.PersonalData.LastName,
+                Patronymic = employee.PersonalData.Patronymic,
+                PrivatePhoneNumber = employee.PrivatePhoneNumber,
+                PrivateEmailAddress = employee.PrivateEmailAddress,
+                WorkEmailAddress = employee.WorkEmailAddress,
+                WorkPhoneNumber = employee.WorkPhoneNumber,
+                Roles = roles,
+                RoleId = (int)employee.PersonalData.Role.Id,
+                Departments = departments
+            };
+            if (employee.DepartmentDTO != null)
+                model.DepartmentId = employee.DepartmentDTO.Id;
+            return model;
+        }
 
     }
 }
