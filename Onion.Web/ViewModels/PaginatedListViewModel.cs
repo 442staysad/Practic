@@ -1,10 +1,13 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Onion.Web.Models;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace Onion.Web.ViewModels
 {
-    public class PagedListViewModel
+    public class PaginatedListViewModel
     {
         public int PageSize { get; private set; }
         public int PageIndex { get; private set; }
@@ -13,25 +16,29 @@ namespace Onion.Web.ViewModels
         public int StartPage { get; private set; }
         public int EndPage { get; private set; }
 
-        public string SortField { get; set; }
-        public string SortDirection { get; set; }
-
         public string FilterString { get; set; }
 
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "dd.MM.yyyy",ApplyFormatInEditMode =true,ConvertEmptyStringToNull =true,NullDisplayText ="дд.мм.гггг")]
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+
+
+        public string SortDirection { get; set; }
+        public string SortField { get; set; }
         public string Action { get; set; } = "Index";
 
         public IEnumerable<object> ListItems { get; set; }
 
-        public PagedListViewModel(int count, int pageIndex, IEnumerable<object> listItems, int pageSize=10)
+        public PaginatedListViewModel(int count, int pageIndex, IEnumerable<object> listItems, int pageSize=10)
         {
             this.PageSize = pageSize;
             this.PageIndex = pageIndex;
             this.TotalItems = count;
             this.ListItems=listItems.Skip((pageIndex - 1) * pageSize)
-                                                .Take(pageSize)
-                                                .AsEnumerable();
+                                                .Take(pageSize);
 
-            int totalPages = (int)Math.Ceiling(count / (double)pageSize);
+            int totalPages = (int)Math.Ceiling(count / (decimal)pageSize);
 
             TotalPages = totalPages;
 

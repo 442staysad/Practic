@@ -1,4 +1,4 @@
-﻿@model Onion.Web.ViewModels.PagedListViewModel;
+﻿@model Onion.Web.ViewModels.PaginatedListViewModel;
 
 <div class="container mt-1">
     <ul class="pagination justify-content-end">
@@ -7,8 +7,9 @@
             @if (Model.PageIndex > 1)
             {
                 <a class="page-link" asp-action="@Model.Action"
-                    
-                   asp-route-pageNumber="@(Model.PageIndex-1)"
+                   asp-route-startDate="@Model.StartDate"
+                   asp-route-endDate="@Model.EndDate"
+                   asp-route-pageIndex="@(Model.PageIndex-1)"
                    asp-route-filterString="@Model.FilterString"
                    asp-route-sortField="@Model.SortField"
                    asp-route-sortDirection="@Model.SortDirection">
@@ -23,7 +24,9 @@
                 @if (pg != Model.PageIndex)
                 {
                     <a class="page-link" asp-action="@Model.Action"
-                        asp-route-pageNumber="@pg"
+                        asp-route-startDate="@Model.StartDate"
+                        asp-route-endDate="@Model.EndDate"
+                        asp-route-pageIndex="@pg"
                         asp-route-filterString="@Model.FilterString"
                         asp-route-sortField="@Model.SortField"
                         asp-route-sortDirection="@Model.SortDirection">
@@ -41,7 +44,9 @@
             @if (Model.PageIndex < Model.TotalPages)
             {
                 <a class="page-link" asp-action="@Model.Action"
-                   asp-route-pageNumber="@(Model.PageIndex+1)"
+                   asp-route-startDate="@Model.StartDate"
+                   asp-route-endDate="@Model.EndDate"
+                   asp-route-pageIndex="@(Model.PageIndex+1)"
                    asp-route-filterString="@Model.FilterString"
                    asp-route-sortField="@Model.SortField"
                    asp-route-sortDirection="@Model.SortDirection">

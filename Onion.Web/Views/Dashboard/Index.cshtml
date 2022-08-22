@@ -1,0 +1,142 @@
+﻿@using System.Globalization
+@model Onion.Web.Models.Dashboard.GanttModel
+
+@{
+}
+<style>
+.x { 
+  width:5px;
+  white-space: nowrap;
+  overflow: visible;
+}</style>
+
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+	<div class="text-center">
+		<div class="row border" style="margin:15px 0">
+			<form asp-controller="Dashboard" asp-action="Index">	
+			<div class="form-inline" style="display:inline-flex ;white-space: nowrap;overflow: visible; justify-content: center; margin:15px 0; width:auto">
+						<label asp-for="DateStart">Дата от:</label>
+						<input type="date" class="form-control" asp-for="DateStart" style="margin-right:5px"/>
+						<span asp-validation-for="DateStart"></span>
+						<label asp-for="DateEnd">Дата до:</label>
+						<input type="date" class="form-control" asp-for="DateEnd" style="margin-right:5px"/>
+						<span asp-validation-for="DateEnd"></span>
+					
+						<label asp-for="Projects">Проект</label>
+						<select class="form-select form-control" data-live-search="true" asp-for="ProjectId" style="margin-right:5px">
+							<option value="@null">Все проекты</option>
+							@foreach(var item in @Model.Projects)
+							{
+								<option value="@item.Id">@item.Name</option>
+							}
+						</select>
+					
+						<label asp-for="Departments">Отдел</label>
+						<select class="form-select form-control" data-live-search="true" asp-for="Departmentid" style="margin-right:5px">
+							<option value="@null">Все отделы</option>
+							@foreach(var item in @Model.Departments)
+							{
+								<option value="@item.Id">@item.Name</option>
+							}
+						</select>
+
+					<div class="btn-group btn-group-toggle" data-toggle="buttons">
+					@if (Model.IsDaysShow.Value==true)
+					{
+						<label class="btn btn-secondary active">
+							<input type="radio" name="IsDaysShow" id="IsDaysShow" asp-for="IsDaysShow" value="@true" autocomplete="off" checked> Дни
+						</label>
+						<label class="btn btn-secondary">
+							<input type="radio" name="IsDaysShow" id="IsDaysShow"  asp-for="IsDaysShow" value="@false" autocomplete="off"> Недели
+						</label>
+					}
+					else
+					{
+						<label class="btn btn-secondary">
+							<input type="radio" name="IsDaysShow" id="IsDaysShow" asp-for="IsDaysShow" value="@true" autocomplete="off"> Дни
+						</label>
+						<label class="btn btn-secondary active">
+							<input type="radio" name=" IsDaysShow" id="IsDaysShow" asp-for="IsDaysShow" value="@false" autocomplete="off"  checked> Недели
+						</label>}
+					</div>
+					<input class="btn btn-outline-success my-2 my-sm-0"
+							type="submit" value="Применить" />
+				</div>
+			</form>
+		</div>
+		<div class="table-responsive overflow-auto" style="max-height:500px">
+			<table class="table table-bordered" style="border-color:gray">
+				<thead class="sticky-top" style="background:#ffffff">
+					<tr>
+						<th rowspan="3" style="width: 1%;white-space: nowrap; position:sticky; left:0px;background:#ffffff" >Сотрудники</th>
+						@for (DateTime i=Model.DateStart.Value;i<=Model.DateEnd.Value.AddDays(27);i=i.AddMonths(1))
+					    {
+							if(i.Month==Model.DateStart.Value.Month)
+							{
+							<th colspan="@(DateTime.DaysInMonth(i.Year,i.Month)-i.Day+1)"> @i.Month/@i.Year</th>
+							}
+							else if(i.Month==Model.DateEnd.Value.Month)
+							{
+								<th colspan="@Model.DateEnd.Value.Day"> @i.Month/@i.Year</th>
+							}
+							else
+							{
+								<th colspan="@DateTime.DaysInMonth(i.Year,i.Month)"> @i.Month/@i.Year</th>
+							}
+					    }
+					</tr>
+					@if(Model.IsDaysShow==false){
+					<tr>
+						@for (DateTime i=Model.DateStart.Value;i<=Model.DateEnd.Value.AddDays(2);i=i.AddDays(7))
+					    {
+							@if (i.Date==Model.DateStart.Value.Date)
+							{
+								if((int)i.DayOfWeek!=0){<th colspan="@(8-(int)i.DayOfWeek)" >@ISOWeek.GetWeekOfYear(i) Нед.</th>}
+								else{<th colspan="1" >@ISOWeek.GetWeekOfYear(i) Нед.</th>}
+							}
+							else if(@ISOWeek.GetWeekOfYear(i)==@ISOWeek.GetWeekOfYear(Model.DateEnd.Value)){
+								if((int)Model.DateEnd.Value.DayOfWeek!=0){<th colspan="@((int)Model.DateEnd.Value.DayOfWeek)" >@ISOWeek.GetWeekOfYear(i) Нед.</th>}
+								else{<th colspan="7" >@ISOWeek.GetWeekOfYear(i) Нед.</th>}
+							}
+							else{<th colspan="7" >@ISOWeek.GetWeekOfYear(i) Нед.</th>}
+						}
+					</tr>}
+					else{
+					<tr>
+						@for (DateTime i=Model.DateStart.Value;i<=Model.DateEnd.Value;i=i.AddDays(1))
+					    {
+							<th colspan="1" >@i.Day</th>
+
+					    }
+					</tr>}
+				</thead>
+				<tbody>
+					@foreach(var item in Model.Employees){
+						<tr style="line-height:5px;">
+							<td style="position:sticky;left:0px; background:#ffffff; width: 1%;white-space: nowrap;" >@item.PersonalData.FullName</td>
+								
+								@for (DateTime i = Model.DateStart.Value; i <= Model.DateEnd.Value; i = i.AddDays(1))
+								{
+									if (item.EmployeeProjects.Count()>0){
+											if (i.Date >= item.EmployeeProjects.First().StartDate&&i.Date <= item.EmployeeProjects.First().EndDate)
+											{
+												if(i.Date==Model.DateStart.Value.Date){<td style="background:yellow"><div class="x" >@item.EmployeeProjects.First().Name</div></td>}
+												else if(i.Date!=item.EmployeeProjects.First().StartDate.Value.Date){<td style="background:yellow"/>}
+												else{<td style="background:yellow"><div class="x" >@item.EmployeeProjects.First().Name</div></td>}
+											}
+
+											else if(i.Date <= Model.DateEnd.Value)
+											{
+												<td/>
+											}
+									}
+									else{<td/>}
+								}
+						</tr>
+					}
+				</tbody>
+			</table>
+
+		</div>
+
+	 </div>
