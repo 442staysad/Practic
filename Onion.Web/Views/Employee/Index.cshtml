@@ -1,7 +1,7 @@
 ﻿<div class="text-center">
 
-        <h2 class="display-5 mt-3 ">Список существующих отделов</h2>
-        <a class="btn btn-outline-success" style="float: right; margin-top:10px" asp-controller="Employee" asp-action="Register" method="get">Зарегестрировать</a>
+        <h2 class="display-5 mt-3 ">Список сотрудников</h2>
+        <a class="btn btn-outline-success" style="float: right; margin-top:10px" asp-controller="Employee" asp-action="Create" method="get">Зарегистрировать</a>
         <div>
             <form asp-controller="Employee" asp-action="Index">
                 <div class="form-inline form-group">
@@ -39,6 +39,7 @@
                         Отдел</a>
                     </th>
                     <th scope="col">Контакты</th>
+                    <th scope="col">Роль</th>
                     <th scope="col">Действие</th>
                 </tr>
             </thead>
@@ -47,9 +48,15 @@
             @foreach(var employee in Model.ListItems){
             <tr>
                 <td>@employee.Id</td>
-                <td>@employee.EmployeeShort.FullName</td>
-                <td>@employee.DepartmentDTO.Name</td>
-                <td>@($"{@employee.WorkEmailAddress} \n{@employee.WorkPhoneNumber}")</td>
+                <td>@employee.PersonalData.FullName</td>
+                    <td>@if (@employee.DepartmentDTO != null)
+                        {
+                            @employee.DepartmentDTO.Name
+                        }
+                    </td>
+                    <td style="width:200px">@employee.WorkEmailAddress
+                    <br>@employee.WorkPhoneNumber<br/></td>
+                <td>@employee.PersonalData.Role.RoleName</td>
                 <td class="col-2 px-4">
                     <a class="btn btn-success btn-sm rounded-0" type="button" data-toggle="tooltip" data-placement="top" title="Edit" 
                             asp-action="Edit" asp-route-id="@employee.Id" asp-controller="Employee" method="get">

@@ -1,0 +1,93 @@
+﻿@model Onion.Web.Models.Project.ProjectModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+<!DOCTYPE html>
+<html>
+<body>
+<h1>Добавить</h1>
+
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" asp-controller="Project">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row mt-1 justify-content-start">
+                <label asp-for="Name" class="control-label">Название</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="row mt-1 justify-content-start">
+                <label asp-for="Description" class="control-label">Описание</label>
+                <textarea asp-for="Description" class="form-control"  style="overflow-y: scroll;height: 100px;resize: none;"></textarea>
+            </div>
+            <div class="row mt-1 justify-content-start">
+                <label asp-for="Status" class="control-label">Статус</label>
+                <input asp-for="Status" class="form-control" />
+            </div>
+            <div class="row mt-1 justify-content-start">
+                <div class="col-4"style="display:inline">
+                    <label class="control-label" asp-for="StartDate"></label>
+                </div>
+                <div class="col-8" style="display:inline">
+                    <input type="date" class="form-control" asp-for="StartDate" />
+                    <span asp-validation-for="StartDate"></span>
+                </div>
+                
+                <div class="col-4"style="display:inline">
+                    <label class="control-label" asp-for="EndDate"></label>
+                </div>
+                <div class="col-8" style="display: inline">
+                    <input type="date" class="form-control" asp-for="EndDate" />
+                    <span asp-validation-for="EndDate"></span>
+                </div>
+            </div>
+            <div class="row mt-1 justify-content-start">
+                    <div class="col-4"style="display:inline">
+                        <label class="control-label" asp-for="LineManagerId">Ответственный</label>
+                    </div>
+                    <select class="form-select form-control show-tick" asp-for="LineManagerId">
+                        <option value="@null">Неназначено</option>
+                        @foreach(var item in @Model.LineManager)
+                        {
+                            <option value="@item.Id">@item.FullName</option>
+            
+                        }
+                    </select>
+            </div>
+            <div class="row mt-1 justify-content-start">
+                <label asp-for="Cost" class="control-label"></label>
+                <input asp-for="Cost" class="form-control" />
+                <span asp-validation-for="Cost"></span>
+            </div>
+
+            <div class="row mt-1 justify-content-start">
+                <label asp-for="ProjectEmployeesIds" class="control-label">Сотрудники на проекте</label>
+                    <select class="form-control form-select" data-live-search="true" multiple asp-for="ProjectEmployeesIds">
+                        @foreach(var item in @Model.Employees)
+                        {
+                            <option value="@item.Id">@item.FullName</option>
+                        }
+                    </select>
+            </div>
+            
+            <div class="row mt-1 justify-content-start">
+                <div class="form-group">
+                    <input type="submit" value="Добавить" class="btn btn-primary btn-block" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div> 
+
+<div class="row mt-1 justify-content-start">
+    <a class="btn btn-outline-secondary btn-outline-primary" asp-action="Index">Назад к списку</a>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+</body>
+</html>

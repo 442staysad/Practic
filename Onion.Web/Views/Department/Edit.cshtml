@@ -1,10 +1,10 @@
-﻿@model EditDepartmentModel
+﻿@model Onion.Web.Models.Department.DepartmentModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Edit";
 }
 
-<h1>Добавить</h1>
+<h1>Изменить</h1>
 
 
 <hr />
@@ -13,23 +13,66 @@
         <form asp-action="Edit" asp-controller="Department">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
+                <label asp-for="Name" class="control-label">Название</label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
+                <label asp-for="Description" class="control-label">Описание</label>
+                <textarea asp-for="Description" class="form-control" style="overflow-y: scroll;height: 100px;resize: none;"></textarea>
             </div>
-            <div class="form-group">
-                    @Html.DropDownListFor(m => m.HeadOfDepartmentId, Model.HeadOfDepartment,new {@class= "form-control"})
-            </div>
+            <div class="row d-flex justify-content-center mt-100">
+                <div class="col-4">
+                    <label asp-for="HeadOfDepartment">Глава отдела</label>
+                </div>
+                <div class="col-8">
+                    <select class="form-select form-control" data-mdb-filter="true" asp-for="HeadOfDepartmentId">
+                        <option value="@null">Неназначено</option>
+                        @foreach(var item in @Model.HeadOfDepartment)
+                        {
+                            <option value="@item.Id">@item.FullName</option>
+                        }
+                    </select>
+                </div>
+            </div>  
             <div class="form-group">
                 <input type="submit" value="Изменить" class="btn btn-primary btn-block" />
             </div>
-            <div>
-                <a class="btn btn-outline-danger" asp-action="Delete" asp-route-Id="@Model.Id">Удалить</a>
+            <div class="form-group">
+                <a class="btn btn-outline-danger" asp-action="Delete" asp-route-Id="@Model.Id">Удалить отдел</a>
             </div>
+            <h1>Сотрудники отдела</h1>
+            <table class="table table-warning">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">
+                            <a class="m-1">ФИО</a>
+                        </th>
+                        <th scope="col">Контакты</th>
+                        <th scope="col">Действие</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.DepartmentEmployees!=null)
+                    {
+                        @foreach (var employee in Model.DepartmentEmployees)
+                        {
+                            <tr>
+                                <td>@employee.PersonalData.FullName</td>
+                                <td style="width:200px">@employee.WorkEmailAddress
+                                    <br>@employee.WorkPhoneNumber<br/></td>
+                                <td class="col-2 px-4">
+                                    <a class="btn btn-outline-danger"  data-placement="top" title="Remove" 
+                                        asp-action="RemoveEmployee" asp-route-empId="@employee.Id" asp-route-depId="@Model.Id" asp-controller="Department">
+                                        Удалть
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+
+                    }
+                </tbody>
+            </table>
         </form>
     </div>
 </div>

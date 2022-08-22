@@ -17,15 +17,15 @@
                  </div>
              </form>
          </div>
-        
+
         <table class="table table-striped">
             <thead class="table-dark">
                 <tr>
                     <th scope="col">N0</th>
                     <th scope="col">
                         <a class="m-1" 
-                        asp-route-sortField="Name" 
-                        asp-action="Index" 
+                        asp-route-sortField="Name"
+                        asp-action="Index"
                         asp-route-SortDirection="@Model.SortDirection"
                         asp-route-sortField="@Model.SortField"
                         asp-route-filterString="@Model.FilterString">Название</a>
@@ -47,7 +47,7 @@
             <tr>
                 <td>@department.Id</td>
                 <td>@department.Name</td>
-                <td>@(department.Manager.EmployeeShort.FullName)</td>
+                <td>@(department.Manager.FullName)</td>
                 <td class="col-2 px-4">
                     <a class="btn btn-success btn-sm rounded-0" type="button" data-toggle="tooltip" data-placement="top" title="Edit" 
                             asp-action="Edit" asp-route-id="@department.Id" asp-controller="Department">
