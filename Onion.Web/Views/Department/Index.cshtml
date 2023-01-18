@@ -1,0 +1,66 @@
+﻿
+<div class="text-center">
+
+        <h2 class="display-5 mt-3 ">Список существующих отделов</h2>
+        <a class="btn btn-outline-success" style="float: right; margin-top:10px" asp-controller="Department" asp-action="Create" method="get">Создать</a>
+        <div>
+            <form asp-controller="Department" asp-action="Index">
+                <div class="form-inline form-group">
+                    <span class="btn-group">
+                        <input class="form-control mr-sm-2" type="text"
+                               name="filterString"
+                               value="@Model.FilterString"
+                               placeholder="Найти"/>
+                    <input class="btn btn-outline-success my-2 my-sm-0"
+                            type="submit" style="margin-left:10px;" value="Поиск" />
+                    </span>
+                 </div>
+             </form>
+         </div>
+
+        <table class="table table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">N0</th>
+                    <th scope="col">
+                        <a class="m-1" 
+                        asp-route-sortField="Name"
+                        asp-action="Index"
+                        asp-route-SortDirection="@Model.SortDirection"
+                        asp-route-sortField="@Model.SortField"
+                        asp-route-filterString="@Model.FilterString">Название</a>
+                    </th>
+
+                    <th scope="col">
+                        <a class="m-1" asp-route-sortField="Head" asp-action="Index"                         
+                        asp-route-SortDirection="@Model.SortDirection"
+                        asp-route-sortField="@Model.SortField"
+                        asp-route-filterString="@Model.FilterString">
+                        Глава отдела</a>
+                    </th>
+                    <th scope="col">Действие</th>
+                </tr>
+            </thead>
+            <tbody>
+             
+            @foreach(var department in Model.ListItems){
+            <tr>
+                <td>@department.Id</td>
+                <td>@department.Name</td>
+                <td>@(department.Manager.FullName)</td>
+                <td class="col-2 px-4">
+                    <a class="btn btn-success btn-sm rounded-0" type="button" data-toggle="tooltip" data-placement="top" title="Edit" 
+                            asp-action="Edit" asp-route-id="@department.Id" asp-controller="Department">
+                        Изменить
+                    </a>
+                </td>
+            </tr>
+            }
+            </tbody>
+        </table>
+        <div class="row">
+            <div class="col-12">
+                <partial name="_pageBar" Model="@Model" />
+            </div>
+        </div>
+</div>

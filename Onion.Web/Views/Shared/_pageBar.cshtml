@@ -1,0 +1,59 @@
+﻿@model Onion.Web.ViewModels.PaginatedListViewModel;
+
+<div class="container mt-1">
+    <ul class="pagination justify-content-end">
+
+        <li class="page-item">
+            @if (Model.PageIndex > 1)
+            {
+                <a class="page-link" asp-action="@Model.Action"
+                   asp-route-startDate="@Model.StartDate"
+                   asp-route-endDate="@Model.EndDate"
+                   asp-route-pageIndex="@(Model.PageIndex-1)"
+                   asp-route-filterString="@Model.FilterString"
+                   asp-route-sortField="@Model.SortField"
+                   asp-route-sortDirection="@Model.SortDirection">
+                   Назад
+                </a>
+            }
+        </li>
+
+        @for (var pg = Model.StartPage; pg <= Model.EndPage; pg++)
+        {
+            <li class="page-item @(pg==Model.PageIndex ?"active":"")">
+                @if (pg != Model.PageIndex)
+                {
+                    <a class="page-link" asp-action="@Model.Action"
+                        asp-route-startDate="@Model.StartDate"
+                        asp-route-endDate="@Model.EndDate"
+                        asp-route-pageIndex="@pg"
+                        asp-route-filterString="@Model.FilterString"
+                        asp-route-sortField="@Model.SortField"
+                        asp-route-sortDirection="@Model.SortDirection">
+                        @pg
+                    </a>
+                }
+                else
+                {
+                    <span class="page-link">@pg</span>
+                }
+            </li>
+        }
+
+        <li class="page-item">
+            @if (Model.PageIndex < Model.TotalPages)
+            {
+                <a class="page-link" asp-action="@Model.Action"
+                   asp-route-startDate="@Model.StartDate"
+                   asp-route-endDate="@Model.EndDate"
+                   asp-route-pageIndex="@(Model.PageIndex+1)"
+                   asp-route-filterString="@Model.FilterString"
+                   asp-route-sortField="@Model.SortField"
+                   asp-route-sortDirection="@Model.SortDirection">
+                    Вперед
+                </a>
+            }
+        </li>
+
+    </ul>
+</div>
